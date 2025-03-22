@@ -115,7 +115,8 @@
         $db = new Database();
         $connection = $db->get_connection();
         try {
-            $res = $db->select ("employee");
+            $res = $db->select("employee");
+            // $res = $connection->query("SELECT * FROM employee;");
             $rows = $res->fetchAll(PDO::FETCH_BOTH);
         } catch (PDOException $e) {
             echo "Connection Failed " . $e->getMessage();

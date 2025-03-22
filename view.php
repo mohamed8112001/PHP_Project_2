@@ -22,7 +22,9 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-            width: 350px;
+            width: 400px;
+            max-width: 90%;
+            transition: transform 0.3s ease;
         }
 
         h2 {
@@ -41,7 +43,7 @@
         }
 
         li {
-            padding: 12px;
+            padding: 14px;
             border-bottom: 1px solid #444;
             font-size: 18px;
             color: #ddd;
@@ -55,66 +57,70 @@
         li:hover {
             background-color: #383856;
         }
+
+        /* زر العودة */
+        .back-btn {
+            display: block;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #6c63ff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #5246d7;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-
         <h2>Employee Details</h2>
         <ul>
             <?php
-
             ini_set('display_errors', 1);
             ini_set('display_startup_errors', 1);
             error_reporting(E_ALL);
-            // echo "view";
+
             session_start();
             if (!isset($_SESSION['email'])) {
                 header("Location: login.php");
+                exit;
             }
-            //connection 
-            $id = $_GET['id'];
-            // var_dump($_GET['id']);
-            
-            require_once("db.php");
-            $db = new Database();
-            // $connection = $db->get_connection();
-            try {
-                $res = $db->select("employee","id={$_GET['id']}");
-                // $res->execute([$id]);
-                $row = $res->fetch(PDO::FETCH_ASSOC);
-            } catch (PDOException $e) {
-                echo "Connection Failed " . $e->getMessage();
+
+            if (isset($_GET['id'])) {
+                require_once("db.php");
+                $db = new Database();
+
+                try {
+                    $id = intval($_GET['id']); 
+                    $res = $db->select("employee", "id={$id}");
+                    $row = $res->fetch(PDO::FETCH_ASSOC);
+
+                    if ($row) {
+                        foreach ($row as $key => $value) {
+                            echo "<li><strong>" . ucfirst($key) . ":</strong> " . htmlspecialchars($value) . "</li>";
+                        }
+                    } else {
+                        echo "<li>No employee found with ID: $id</li>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<li>Error: " . htmlspecialchars($e->getMessage()) . "</li>";
+                }
+            } else {
+                echo "<li>Invalid ID provided.</li>";
             }
-            // try{
-            // $connection = new PDO("mysql:host=localhost;dbname=PHP_TEST", "mohamed", "Mohamed@8112001", );
-// if ($connection->errno) {
-//     die("Connection Falied");
-// }
-            
-            //query 
-// replace $connection->query by ->prepare then the output->execute
-// $res = $connection->query("SELECT *FROM employee WHERE id=$id ;");
-// $res = $connection->prepare(query: "SELECT *FROM employee WHERE id=?");
-// $res->execute([$id]);
-// $row = $res->fetch(PDO::FETCH_ASSOC);
-            
-
-
-
-            foreach ($row as $value) {
-                echo "<li>" . $value . "</li>";
-            }
-            echo "</ul> 
-</div>
-
-</body>
-</html>
-";
-
-            // // }
-// catch(PDOException $e){
-//     echo "Connection falied".$e->getMessage();
-// }
             ?>
+        </ul>
+
+        <a href="list.php" class="back-btn">Back to Employees</a>
+    </div>
+</body>
+
+</html>
